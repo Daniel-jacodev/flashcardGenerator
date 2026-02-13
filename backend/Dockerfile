@@ -1,5 +1,5 @@
 # Estágio 1: Build do Go
-FROM golang:1.21-bookworm AS builder
+FROM golang:1.24-bookworm AS builder
 
 WORKDIR /app
 
