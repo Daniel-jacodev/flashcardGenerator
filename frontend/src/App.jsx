@@ -23,7 +23,7 @@ function App() {
 
     try {
       const response = await axios.post(
-        "https://flashcardgenerator-yua3.onrender.com",
+        "https://flashcardgenerator-yua3.onrender.com/generate",
         formData
       );
       setFlashcards(response.data.flashcards);
