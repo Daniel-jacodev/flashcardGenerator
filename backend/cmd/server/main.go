@@ -20,7 +20,11 @@ func main() {
 	}
 
 	r := gin.Default()
-	r.Use(cors.Default())
+	r.Use(cors.New(cors.Config{
+    AllowAllOrigins: true, // Isso permite que o frontend da Vercel fale com o Koyeb sem erro
+    AllowMethods:    []string{"POST", "GET", "OPTIONS"},
+    AllowHeaders:    []string{"Origin", "Content-Type", "Accept"},
+}))
 
 	r.POST("/generate", func(c *gin.Context) {
 		var textoExtraido string

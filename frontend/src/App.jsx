@@ -23,7 +23,7 @@ function App() {
 
     try {
       const response = await axios.post(
-        "fine-courtney-jacodev-88c04d90.koyeb.app/generate",
+        "https://fine-courtney-jacodev-88c04d90.koyeb.app/generate",
         formData
       );
       setFlashcards(response.data.flashcards);
