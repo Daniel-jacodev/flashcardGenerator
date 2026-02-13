@@ -23,7 +23,7 @@ function App() {
 
     try {
       const response = await axios.post(
-        "https://flashcardgenerator-yua3.onrender.com/generate",
+        "fine-courtney-jacodev-88c04d90.koyeb.app/generate",
         formData
       );
       setFlashcards(response.data.flashcards);
