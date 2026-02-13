@@ -1,2 +1,9 @@
+# Go
+backend/main
+backend/uploads/*
 .env
-/uploads
+
+# Node
+node_modules/
+dist/
+.DS_Storegit
