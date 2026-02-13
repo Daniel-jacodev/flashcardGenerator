@@ -13,13 +13,14 @@ func DownloadYoutubeAudio(url string) (string, error) {
 	os.Remove(finalPath)
 
 	cmd := exec.Command("yt-dlp", 
-		"-x", 
-		"--audio-format", "mp3", 
-		"--audio-quality", "0", 
-		"--max-filesize", "25M",
-		"-o", "../../uploads/yt_audio.%(ext)s", 
-		url,
-	)
+    "--extractor-args", "youtube:player_client=ios,web", // Simula clientes mais comuns
+    "--force-overwrites",
+    "--no-playlist",
+    "-x", 
+    "--audio-format", "mp3",
+    "-o", "../../uploads/yt_audio.%(ext)s", 
+    url,
+)
 
 
 	output, err := cmd.CombinedOutput()
