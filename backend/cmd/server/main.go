@@ -29,13 +29,13 @@ func main() {
 
 	r := gin.Default()
 
-	// Configuração do CORS para permitir que a Vercel acesse o Koyeb
+	
 	r.Use(cors.New(cors.Config{
-		AllowAllOrigins:  true,
-		AllowMethods:     []string{"POST", "GET", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Accept"},
-		AllowCredentials: true,
-	}))
+    AllowOrigins:     []string{"http://localhost:5173"}, // Permite o seu React
+    AllowMethods:     []string{"POST", "GET", "OPTIONS"},
+    AllowHeaders:     []string{"Origin", "Content-Type", "Accept"},
+    AllowCredentials: true,
+}))
 
 	r.POST("/generate", func(c *gin.Context) {
 		var textoExtraido string

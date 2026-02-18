@@ -10,37 +10,57 @@ function App() {
   const [mode, setMode] = useState("file"); // 'file' ou 'url'
 
   const handleGenerate = async () => {
-    setLoading(true);
-    const formData = new FormData();
+    // Validações antes de iniciar
+    if (mode === "file" && !file)
+      return alert("Por favor, selecione um arquivo PDF!");
+    if (mode === "url" && !url)
+      return alert("Por favor, cole uma URL do YouTube!");
 
+    setLoading(true);
+    setFlashcards(""); // Limpa resultados anteriores
+
+    const formData = new FormData();
     if (mode === "file") {
-      if (!file) return alert("Selecione um arquivo!");
       formData.append("file", file);
     } else {
-      if (!url) return alert("Cole uma URL do YouTube!");
       formData.append("url", url);
     }
 
     try {
-      const response = await axios.post(
-        "https://fine-courtney-jacodev-88c04d90.koyeb.app/generate",
-        formData
-      );
-      setFlashcards(response.data.flashcards);
+      // Chamada para o seu backend Go local
+      const API_URL = "http://localhost:8080/generate";
+
+      const response = await axios.post(API_URL, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      // Atualiza o estado com os flashcards retornados pelo Go
+      if (response.data && response.data.flashcards) {
+        setFlashcards(response.data.flashcards);
+      } else {
+        alert("O servidor não retornou flashcards válidos.");
+      }
     } catch (error) {
-      alert("Erro ao gerar flashcards. Verifique o backend.");
+      console.error("Erro na requisição:", error);
+      alert(
+        "Erro ao conectar com o backend. Certifique-se que o servidor Go está rodando na porta 8080."
+      );
     } finally {
       setLoading(false);
     }
   };
 
   const downloadCSV = () => {
+    if (!flashcards) return;
     const blob = new Blob([flashcards], { type: "text/csv" });
     const urlBlob = window.URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = urlBlob;
     a.download = `flashcards_${Date.now()}.csv`;
     a.click();
+    window.URL.revokeObjectURL(urlBlob);
   };
 
   return (
@@ -51,23 +71,31 @@ function App() {
           <h1 className="text-4xl font-extrabold bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">
             Flashcard Generator AI
           </h1>
-          <p className="text-slate-400 mt-2">Estude com eficiência usando IA</p>
+          <p className="text-slate-400 mt-2">
+            Estude com eficiência usando IA (Local Mode)
+          </p>
         </header>
 
         {/* Seletor de Modo */}
         <div className="flex justify-center gap-4 mb-8">
           <button
-            onClick={() => setMode("file")}
+            onClick={() => {
+              setMode("file");
+              setFlashcards("");
+            }}
             className={`flex items-center gap-2 px-6 py-2 rounded-full transition ${
               mode === "file"
                 ? "bg-blue-600"
                 : "bg-slate-800 hover:bg-slate-700"
             }`}
           >
-            <FileText size={20} /> Arquivo
+            <FileText size={20} /> Arquivo PDF
           </button>
           <button
-            onClick={() => setMode("url")}
+            onClick={() => {
+              setMode("url");
+              setFlashcards("");
+            }}
             className={`flex items-center gap-2 px-6 py-2 rounded-full transition ${
               mode === "url" ? "bg-red-600" : "bg-slate-800 hover:bg-slate-700"
             }`}
@@ -85,7 +113,7 @@ function App() {
                 id="pdf"
                 className="hidden"
                 onChange={(e) => setFile(e.target.files[0])}
-                accept=".pdf,.mp3,.m4a"
+                accept=".pdf"
               />
               <label
                 htmlFor="pdf"
@@ -93,7 +121,7 @@ function App() {
               >
                 <FileText className="mx-auto mb-4 text-slate-500" size={48} />
                 <p className="text-slate-300">
-                  {file ? file.name : "Arraste ou selecione PDF/MP3"}
+                  {file ? file.name : "Arraste ou selecione um arquivo PDF"}
                 </p>
               </label>
             </div>
@@ -119,11 +147,11 @@ function App() {
           >
             {loading ? (
               <>
-                <Loader2 className="animate-spin" /> Gerando Cards...
+                <Loader2 className="animate-spin" /> Processando...
               </>
             ) : (
               <>
-                <Play /> Começar Mágica
+                <Play size={20} /> Gerar Flashcards
               </>
             )}
           </button>
@@ -131,36 +159,41 @@ function App() {
 
         {/* Resultados */}
         {flashcards && (
-          <div className="mt-12 animate-in fade-in duration-500">
+          <div className="mt-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold">Cards Prontos</h2>
+              <h2 className="text-2xl font-bold">Cards Gerados</h2>
               <button
                 onClick={downloadCSV}
-                className="flex items-center gap-2 text-emerald-400 hover:text-emerald-300 font-medium"
+                className="flex items-center gap-2 text-emerald-400 hover:text-emerald-300 font-medium bg-emerald-400/10 px-4 py-2 rounded-lg transition"
               >
-                <Download size={20} /> Baixar .CSV para Anki
+                <Download size={20} /> Baixar CSV para Anki
               </button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {flashcards
                 .split("\n")
-                .filter((l) => l.includes(";"))
-                .map((card, i) => (
-                  <div
-                    key={i}
-                    className="bg-slate-900 p-6 rounded-xl border-l-4 border-blue-500"
-                  >
-                    <p className="text-xs text-blue-400 uppercase font-bold tracking-widest mb-1">
-                      Frente
-                    </p>
-                    <p className="text-slate-200 mb-4">{card.split(";")[0]}</p>
-                    <p className="text-xs text-emerald-400 uppercase font-bold tracking-widest mb-1">
-                      Verso
-                    </p>
-                    <p className="text-slate-400">{card.split(";")[1]}</p>
-                  </div>
-                ))}
+                .filter((line) => line.trim() !== "" && line.includes(";"))
+                .map((card, i) => {
+                  const [pergunta, resposta] = card.split(";");
+                  return (
+                    <div
+                      key={i}
+                      className="bg-slate-900 p-6 rounded-xl border-l-4 border-blue-500 hover:shadow-lg transition shadow-md"
+                    >
+                      <p className="text-[10px] text-blue-400 uppercase font-bold tracking-widest mb-1">
+                        Pergunta
+                      </p>
+                      <p className="text-slate-200 mb-4 font-medium">
+                        {pergunta}
+                      </p>
+                      <p className="text-[10px] text-emerald-400 uppercase font-bold tracking-widest mb-1">
+                        Resposta
+                      </p>
+                      <p className="text-slate-400 text-sm">{resposta}</p>
+                    </div>
+                  );
+                })}
             </div>
           </div>
         )}
