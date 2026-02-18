@@ -1,7 +1,3 @@
-Aqui está o arquivo README.md completo e estruturado para o seu repositório. Ele reflete a nova arquitetura de microsserviços que montamos para rodar localmente no seu Pop!\_OS, garantindo que o sistema seja resiliente e fácil de configurar.
-
-Markdown
-
 # 📇 Gerador de Flashcards com IA (YouTube & PDF)
 
 Este projeto é uma ferramenta completa para estudantes que desejam transformar conteúdos de vídeos do YouTube ou documentos PDF em flashcards de estudo de forma automática. O sistema utiliza **Inteligência Artificial (Groq/Gemini)** para processar o texto e gerar perguntas e respostas inteligentes.
