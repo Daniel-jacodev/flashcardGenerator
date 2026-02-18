@@ -26,7 +26,7 @@ def get_transcript():
         video_id = extract_video_id(video_url).strip()
         print(f"Tentando processar ID: {video_id}")
 
-        # Único método que seu sistema confirmou ter: api.list()
+   
         api = YouTubeTranscriptApi()
         transcript_list = api.list(video_id)
         
